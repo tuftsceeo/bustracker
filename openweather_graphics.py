@@ -148,9 +148,16 @@ class OpenWeather_Graphics(displayio.Group):
                 self.bus_id1.text = "BUS ID : " + bus_id2
                 self.bus2.text =  str(actualtime1)
                 self.bus1.text =  str(actualtime2)
+            elif bus_id1 == '101':
+                self.bus_id1.text = "BUS ID : " + bus_id1
+                self.bus_id2.text = "BUS ID : " + bus_id2
+                self.bus1.text =  str(actualtime1)
+                self.bus2.text =  str(actualtime2)
             else :
                 self.bus_id1.text="No prediction"
                 self.bus_id2.text="No prediction"
+                self.bus2.text =  " "
+                self.bus1.text =  " "
 
         except:
             print("some weird error that should not have happened")
