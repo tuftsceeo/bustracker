@@ -11,6 +11,7 @@ from adafruit_pyportal import PyPortal
 cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
 sys.path.append(cwd)
 import openweather_graphics  # pylint: disable=wrong-import-position
+import adafruit_requests as requests
 
 
 # Get wifi details and more from a secrets.py file
@@ -23,6 +24,8 @@ except ImportError:
 DATA_SOURCE = "https://api-v3.mbta.com/predictions?page%5Blimit%5D=2&sort=arrival_time&filter%5Bdirection_id%5D=1&filter%5Bstop%5D=2373"
 DATA_LOCATION = []
 
+DATA_SOURCE2 = "https://api-v3.mbta.com/predictions?page%5Blimit%5D=2&sort=arrival_time&filter%5Bdirection_id%5D=0&filter%5Bstop%5D=2413"
+DATA_LOCATION2 = []
 
 # Initialize the pyportal object and let us know what data to fetch and where
 # to display it
@@ -30,7 +33,6 @@ pyportal = PyPortal(url=DATA_SOURCE,
                     json_path=DATA_LOCATION,
                     status_neopixel=board.NEOPIXEL,
                     default_bg=0x000000)
-
 
 gfx = openweather_graphics.OpenWeather_Graphics(pyportal.splash)
 
@@ -48,9 +50,15 @@ while True:
             print("Some error occured, retrying! -", e)
             continue
     try:
-        value = pyportal.fetch()
+        #value = pyportal.fetch()
+        #response = requests.get(DATA_SOURCE)
+        #value = response.json()  # Parse the JSON response
 
-        gfx.display_time(value)
+        #pyportal only allows one API to be set and fetched, manually fetching other data with adafruit_requests
+        #response2 = requests.get(DATA_SOURCE2)
+        #value2 = response2.json()  # Parse the JSON response
+
+        gfx.display_time(DATA_SOURCE, DATA_SOURCE2)
         weather_refresh = time.monotonic()
 
         gfx.update_time()
@@ -59,7 +67,7 @@ while True:
     except RuntimeError as e:
 
         print("main loop error occured, retrying! -", e)
-        
-        continue
+        if (str(e)=="Failed to request hostname" or str(e)==" Failed to request hostname"):
+            supervisor.reload()
 
-   
+        continue

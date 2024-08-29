@@ -3,12 +3,14 @@ import json
 import displayio
 from adafruit_display_text.label import Label
 from adafruit_bitmap_font import bitmap_font
+import adafruit_requests as requests
 
-cwd = ("/"+__file__).rsplit('/', 1)[0] # the current working directory (where this file is)
+cwd = ("/" + __file__).rsplit('/', 1)[0]  # the current working directory (where this file is)
 
-small_font = cwd+"/fonts/Arial-12.bdf"
-medium_font = cwd+"/fonts/Arial-16.bdf"
-large_font = cwd+"/fonts/Arial-Bold-24.bdf" #not really
+small_font = cwd + "/fonts/Arial-12.bdf"
+medium_font = cwd + "/fonts/Arial-16.bdf"
+large_font = cwd + "/fonts/Arial-Bold-24.bdf"  # not really
+
 
 class OpenWeather_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True, celsius=True):
@@ -24,7 +26,7 @@ class OpenWeather_Graphics(displayio.Group):
 
         self._icon_sprite = None
         self._icon_file = None
-        self.set_icon(cwd+"/background.bmp")
+        self.set_icon(cwd + "/background.bmp")
 
         self.small_font = bitmap_font.load_font(small_font)
         self.medium_font = bitmap_font.load_font(medium_font)
@@ -42,15 +44,12 @@ class OpenWeather_Graphics(displayio.Group):
         self.time_text.color = 0xFFFFFF
         self._text_group.append(self.time_text)
 
-        
-
         self.going = Label(self.medium_font, max_glyphs=20)
         self.going.x = 10
         self.going.y = 10
         self.going.color = 0x00FF00
         self._text_group.append(self.going)
-        self.going.text="Taking bus ? "
-
+        self.going.text = "Taking bus ? "
 
         self.bus_id1 = Label(self.small_font, max_glyphs=20)
         self.bus_id1.x = 10
@@ -58,116 +57,136 @@ class OpenWeather_Graphics(displayio.Group):
         self.bus_id1.color = 0xFFFF00
         self._text_group.append(self.bus_id1)
 
-
         self.bus_id2 = Label(self.small_font, max_glyphs=20)
         self.bus_id2.x = 210
         self.bus_id2.y = 65
         self.bus_id2.color = 0xFFFF00
         self._text_group.append(self.bus_id2)
 
-
-
-
-
         self.bus1 = Label(self.large_font, max_glyphs=20)
-        self.bus1.x = 30
+        self.bus1.x = 10
         self.bus1.y = 115
         self.bus1.color = 0xFFFFFF
         self._text_group.append(self.bus1)
 
         self.bus2 = Label(self.large_font, max_glyphs=20)
-        self.bus2.x = 235
+        self.bus2.x = 210
         self.bus2.y = 115
         self.bus2.color = 0xFFFFFF
         self._text_group.append(self.bus2)
 
-        
-       
+        # Direction away from campus
 
-     
+        self.bus3 = Label(self.medium_font, max_glyphs=20)
+        self.bus3.x = 95
+        self.bus3.y = 155
+        self.bus3.color = 0xFFFFFF
+        self._text_group.append(self.bus3)
 
-    def display_time(self, data):
-        
+        self.bus4 = Label(self.medium_font, max_glyphs=20)
+        self.bus4.x = 295
+        self.bus4.y = 155
+        self.bus4.color = 0xFFFFFF
+        self._text_group.append(self.bus4)
+
+    def display_time(self, url, url2):
+
         try:
 
-            data = json.loads(data)
-            time=self.update_time()
-            time_in_min=time[3]*60+time[4]     
+            response = requests.get(url)
+            value = response.json()  # Parse the JSON response
+            response2 = requests.get(url2)
+            value2 = response2.json()  # Parse the JSON response
+            data = value
+            data2 = value2
+            time = self.update_time()
+            time_in_min = time[3] * 60 + time[4]
 
         except:
             print("okay")
 
         try:
-            bus_id1=data['data'][0]['relationships']['route']['data']['id']
-            bus_id2=data['data'][1]['relationships']['route']['data']['id']
+            bus_id1 = data['data'][0]['relationships']['route']['data']['id']
+            bus_id2 = data['data'][1]['relationships']['route']['data']['id']
+            bus_id3 = data2['data'][0]['relationships']['route']['data']['id']
+            bus_id4 = data2['data'][1]['relationships']['route']['data']['id']
 
         except:
             print("error")
 
-
-        try: 
+        try:
             timeresult1 = data['data'][0]['attributes']['arrival_time']
-            bus_time1=timeresult1.split("T")[1].split("-")[0].split(":")
-            actualtime1=int(bus_time1[0])*60+int(bus_time1[1])
-            actualtime1=actualtime1-time_in_min
+            bus_time1 = timeresult1.split("T")[1].split("-")[0].split(":")
+            actualtime1 = int(bus_time1[0]) * 60 + int(bus_time1[1])
+            actualtime1 = actualtime1 - time_in_min
+
+        except:
+            print("error1")
+
+        try:
+            timeresult2 = data['data'][1]['attributes']['arrival_time']
+            bus_time2 = timeresult2.split("T")[1].split("-")[0].split(":")
+            actualtime2 = int(bus_time2[0]) * 60 + int(bus_time2[1])
+            actualtime2 = actualtime2 - time_in_min
 
         except:
             print("error2")
 
+        try:
+            timeresult3 = data2['data'][0]['attributes']['arrival_time']
+            bus_time3 = timeresult3.split("T")[1].split("-")[0].split(":")
+            actualtime3 = int(bus_time3[0]) * 60 + int(bus_time3[1])
+            actualtime3 = actualtime3 - time_in_min
+
+        except:
+            print("error3")
 
         try:
-            timeresult2 = data['data'][1]['attributes']['arrival_time']
-            bus_time2=timeresult2.split("T")[1].split("-")[0].split(":")
-            actualtime2=int(bus_time2[0])*60+int(bus_time2[1])
-            actualtime2=actualtime2-time_in_min
-            
+            timeresult4 = data2['data'][1]['attributes']['arrival_time']
+            bus_time4 = timeresult4.split("T")[1].split("-")[0].split(":")
+            actualtime4 = int(bus_time4[0]) * 60 + int(bus_time4[1])
+            actualtime4 = actualtime4 - time_in_min
+
         except:
             print("error4")
 
         try:
             if (actualtime1 or actualtime2) < 10:
-                
+
                 if (actualtime1 or actualtime2) < 3:
-                    self.set_icon(cwd+"/icons/01dred.bmp")
-                else :
-                    self.set_icon(cwd+"/icons/01dyellow.bmp")
-            else : 
-                self.set_icon(cwd+"/icons/01dgreen.bmp")
+                    self.set_icon(cwd + "/icons/01dred.bmp")
+                else:
+                    self.set_icon(cwd + "/icons/01dyellow.bmp")
+            else:
+                self.set_icon(cwd + "/icons/01dgreen.bmp")
         except:
             print("some error with icons")
 
         try:
 
-            if bus_id1=='94': #so that the 94 gets always displayed on the right 
+            if bus_id1 == '94':  # so that the 94 gets always displayed on the right 
                 self.bus_id1.text = "BUS ID : " + bus_id1
                 self.bus_id2.text = "BUS ID : " + bus_id2
-                self.bus1.text =  str(actualtime1)
-                self.bus2.text =  str(actualtime2)
+                self.bus1.text = str(actualtime1)
+                self.bus2.text = str(actualtime2)
             elif bus_id1 == '80':
                 self.bus_id2.text = "BUS ID : " + bus_id1
                 self.bus_id1.text = "BUS ID : " + bus_id2
-                self.bus2.text =  str(actualtime1)
-                self.bus1.text =  str(actualtime2)
-            elif bus_id1 == '101':
-                self.bus_id1.text = "BUS ID : " + bus_id1
-                self.bus_id2.text = "BUS ID : " + bus_id2
-                self.bus1.text =  str(actualtime1)
-                self.bus2.text =  str(actualtime2)
-            else :
-                self.bus_id1.text="No prediction"
-                self.bus_id2.text="No prediction"
-                self.bus2.text =  " "
-                self.bus1.text =  " "
+                self.bus2.text = str(actualtime1)
+                self.bus1.text = str(actualtime2)
+            else:
+                self.bus_id1.text = "No prediction"
+                self.bus_id2.text = "No prediction"
+
+            if bus_id3 == '94':  # so that the 94 gets always displayed on the right
+                self.bus3.text = str(actualtime3)
+                self.bus4.text = str(actualtime4)
+            elif bus_id3 == '80':
+                self.bus4.text = str(actualtime3)
+                self.bus3.text = str(actualtime4)
 
         except:
             print("some weird error that should not have happened")
-
-
-
-
-
-
-
 
     def update_time(self):
         """Fetch the time.localtime(), parse it out and update the display text"""
@@ -178,9 +197,9 @@ class OpenWeather_Graphics(displayio.Group):
         if self.am_pm:
             if hour >= 12:
                 hour -= 12
-                format_str = format_str+" PM"
+                format_str = format_str + " PM"
             else:
-                format_str = format_str+" AM"
+                format_str = format_str + " AM"
             if hour == 0:
                 hour = 12
         time_str = format_str % (hour, minute)
@@ -206,5 +225,5 @@ class OpenWeather_Graphics(displayio.Group):
         except TypeError:
             self._icon_sprite = displayio.TileGrid(icon,
                                                    pixel_shader=displayio.ColorConverter(),
-                                                   position=(0,0))
+                                                   position=(0, 0))
         self._icon_group.append(self._icon_sprite)
