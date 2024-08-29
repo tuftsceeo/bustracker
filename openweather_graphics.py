@@ -78,14 +78,14 @@ class OpenWeather_Graphics(displayio.Group):
         # Direction away from campus
 
         self.bus3 = Label(self.medium_font, max_glyphs=20)
-        self.bus3.x = 95
-        self.bus3.y = 155
+        self.bus3.x = 85
+        self.bus3.y = 125
         self.bus3.color = 0xFFFFFF
         self._text_group.append(self.bus3)
 
         self.bus4 = Label(self.medium_font, max_glyphs=20)
-        self.bus4.x = 295
-        self.bus4.y = 155
+        self.bus4.x = 285
+        self.bus4.y = 125
         self.bus4.color = 0xFFFFFF
         self._text_group.append(self.bus4)
 
