@@ -35,7 +35,7 @@ pyportal = PyPortal(status_neopixel=board.NEOPIXEL,
 
 gfx = openweather_graphics.OpenWeather_Graphics(pyportal.splash)
 
-
+startime = time.monotonic()
 localtile_refresh = None
 weather_refresh = None
 while True:
@@ -55,6 +55,7 @@ while True:
 
         gfx.update_time()
         time.sleep(20)
+        print("Ran loop! Running for: " + str(time.monotonic()-startime))
          # wait 20 seconds before updating anything again
     except RuntimeError as e:
 

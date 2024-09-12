@@ -92,11 +92,12 @@ class OpenWeather_Graphics(displayio.Group):
     def display_time(self, url, url2):
 
         try:
-
             response = requests.get(url)
             value = response.json()  # Parse the JSON response
+            print(value)
             response2 = requests.get(url2)
             value2 = response2.json()  # Parse the JSON response
+            print(value2)
             data = value
             data2 = value2
             time = self.update_time()
@@ -184,9 +185,10 @@ class OpenWeather_Graphics(displayio.Group):
             elif bus_id3 == '80':
                 self.bus4.text = str(actualtime3)
                 self.bus3.text = str(actualtime4)
-
         except:
             print("some weird error that should not have happened")
+
+        print("Calculated numbers: " + str(actualtime1) + " " + str(actualtime2) + " " + str(actualtime3) + " " + str(actualtime4))
 
     def update_time(self):
         """Fetch the time.localtime(), parse it out and update the display text"""
