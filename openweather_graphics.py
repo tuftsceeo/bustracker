@@ -11,7 +11,6 @@ small_font = cwd + "/fonts/Arial-12.bdf"
 medium_font = cwd + "/fonts/Arial-16.bdf"
 large_font = cwd + "/fonts/Arial-Bold-24.bdf"  # not really
 
-
 class OpenWeather_Graphics(displayio.Group):
     def __init__(self, root_group, *, am_pm=True, celsius=True):
         super().__init__(max_size=2)
@@ -103,8 +102,13 @@ class OpenWeather_Graphics(displayio.Group):
             time = self.update_time()
             time_in_min = time[3] * 60 + time[4]
 
-        except:
+        except Exception as e:
             print("okay")
+            global error_refresh
+            error_refresh = True
+            print("An error occurred: {}".format(e))
+
+            return
 
         try:
             bus_id1 = data['data'][0]['relationships']['route']['data']['id']
@@ -164,8 +168,7 @@ class OpenWeather_Graphics(displayio.Group):
             print("some error with icons")
 
         try:
-
-            if bus_id1 == '94':  # so that the 94 gets always displayed on the right 
+            if bus_id1 == '94':  # so that the 94 gets always displayed on the right
                 self.bus_id1.text = "BUS ID : " + bus_id1
                 self.bus_id2.text = "BUS ID : " + bus_id2
                 self.bus1.text = str(actualtime1)
@@ -175,6 +178,16 @@ class OpenWeather_Graphics(displayio.Group):
                 self.bus_id1.text = "BUS ID : " + bus_id2
                 self.bus2.text = str(actualtime1)
                 self.bus1.text = str(actualtime2)
+            elif bus_id2 == '94': # account for potential 101 bus
+                self.bus_id2.text = "BUS ID : " + bus_id1
+                self.bus_id1.text = "BUS ID : " + bus_id2
+                self.bus2.text = str(actualtime1)
+                self.bus1.text = str(actualtime2)
+            elif bus_id2 == '80':  # account for potential 101 bus
+                self.bus_id1.text = "BUS ID : " + bus_id1
+                self.bus_id2.text = "BUS ID : " + bus_id2
+                self.bus1.text = str(actualtime1)
+                self.bus2.text = str(actualtime2)
             else:
                 self.bus_id1.text = "No prediction"
                 self.bus_id2.text = "No prediction"
@@ -185,10 +198,19 @@ class OpenWeather_Graphics(displayio.Group):
             elif bus_id3 == '80':
                 self.bus4.text = str(actualtime3)
                 self.bus3.text = str(actualtime4)
+            elif bus_id4 == '80':  # in case of 101
+                self.bus3.text = str(actualtime3)
+                self.bus4.text = str(actualtime4)
+            elif bus_id4 == '94':
+                self.bus4.text = str(actualtime3)
+                self.bus3.text = str(actualtime4)
         except:
             print("some weird error that should not have happened")
 
-        print("Calculated numbers: " + str(actualtime1) + " " + str(actualtime2) + " " + str(actualtime3) + " " + str(actualtime4))
+        try:
+            print("Calculated numbers: " + str(actualtime1) + " " + str(actualtime2) + " " + str(actualtime3) + " " + str(actualtime4))
+        except:
+            print("error1-4")
 
     def update_time(self):
         """Fetch the time.localtime(), parse it out and update the display text"""

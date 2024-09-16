@@ -38,9 +38,12 @@ gfx = openweather_graphics.OpenWeather_Graphics(pyportal.splash)
 startime = time.monotonic()
 localtile_refresh = None
 weather_refresh = None
+error_refresh = False
 while True:
     # only query the online time once per hour (and on first run)
-    if (not localtile_refresh) or (time.monotonic() - localtile_refresh) > 3600:
+    if (not localtile_refresh) or (time.monotonic() - localtile_refresh) > 3600 or error_refresh:
+        print(error_refresh)
+        error_refresh = False
         try:
             print("Getting time from internet!")
             pyportal.get_local_time()
